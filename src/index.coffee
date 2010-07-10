@@ -17,7 +17,10 @@ class ChainGang
 
   shift: () ->
     name: @queue.shift()
-    @index[name]
+    {"name": name, callback: @index[name]}
+
+  finish: (name) ->
+    delete @index[name]
 
   addListener: (event, listener) ->
     @events.addListener(event, listener)

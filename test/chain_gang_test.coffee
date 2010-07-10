@@ -10,12 +10,13 @@ assert.equal(3, chain.workers)
 
 # test adding an item to the queue
 called: false
-chain.addListener 'add', (name) ->
+cb: (name) ->
   called: true
   assert.equal('foo',       name)
   assert.equal('work!',     chain.index[name])
   assert.deepEqual(['foo'], chain.queue)
 
+chain.addListener 'add', cb
 chain.add('foo', 'work!')
 assert.ok(called)
 
@@ -23,3 +24,32 @@ assert.ok(called)
 called: false
 chain.add('foo')
 assert.equal(false, called)
+chain.removeListener 'add', cb
+
+# test adding a 2nd item to the queue
+called: false
+a: 0
+job: () ->
+  a += 1
+cb: (name) ->
+  called: true
+  assert.equal('bar', name)
+  assert.equal(job,   chain.index[name])
+  assert.deepEqual(['foo', 'bar'], chain.queue)
+
+chain.addListener 'add', cb
+
+chain.add('bar', job)
+assert.ok(called)
+
+# test shifting an item from the queue
+foo: chain.shift()
+assert.equal('foo',   foo.name)
+assert.equal('work!', foo.callback)
+assert.equal(foo.callback, chain.index[foo.name])
+assert.deepEqual(['bar'], chain.queue)
+
+# test finishing an item in the queue
+chain.finish(foo.name)
+assert.equal(undefined, chain.index[foo.name])
+assert.deepEqual(['bar'], chain.queue)
