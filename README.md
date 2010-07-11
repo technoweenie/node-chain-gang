@@ -5,10 +5,19 @@ Chain Gang is a small in-process Node.js queue.  It ensures a limit to the numbe
     var chainGang = require('chaingang')
     var chain     = chainGang.create({workers: 3})
 
+    var workCallback = function(worker) {
+      // do some work
+      worker.finish() // and call this when finished
+    }
+
     chain.add('foo', workCallback)
     chain.add('bar', workCallback)
     chain.add('baz', workCallback)
     chain.add('qux', workCallback) // waits until one finishes
+
+    chain.addListener('error', function(name, error) {
+      
+    })
 
     chain.addListener('finished', function(name, value) {
       sys.puts(name + " has finished, leaving us with " + sys.inspect(value))
@@ -17,10 +26,6 @@ Chain Gang is a small in-process Node.js queue.  It ensures a limit to the numbe
 ## Use Case
 
 Let's say you have an expensive child process to run when requests come in.  If traffic is really busy, you don't want to spin up 50 of these at once.  Also, you don't want identical child processes running.  If multiple requests want the same thing, assume they'll all get notified when it's finished.
-
-## TODO
-
-* Um, finish the lib.
 
 ## NOT TODO
 
