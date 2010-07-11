@@ -28,17 +28,11 @@ ended: []
 chain.addListener 'finished', (name) ->
   ended.push(name)
 
-chain.add 'a', job
-chain.add 'b', job
-chain.add 'c', job
+chain.add job, 'a'
+chain.add job, 'b'
+chain.add job, 'c'
 
 process.addListener 'exit', ->
-  assert.ok(called.indexOf('a') > -1)
-  assert.ok(called.indexOf('b') > -1)
-  assert.ok(called.indexOf('c') > -1)
-  assert.ok(started.indexOf('a') > -1)
-  assert.ok(started.indexOf('b') > -1)
-  assert.ok(started.indexOf('c') > -1)
-  assert.ok(ended.indexOf('a') > -1)
-  assert.ok(ended.indexOf('b') > -1)
-  assert.ok(ended.indexOf('c') > -1)
+  assert.deepEqual(['a', 'b', 'c'], called)
+  assert.deepEqual(['a', 'b', 'c'], started)
+  assert.deepEqual(['a', 'b', 'c'], ended)

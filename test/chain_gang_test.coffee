@@ -18,12 +18,12 @@ cb: (name) ->
   assert.deepEqual(['foo'], chain.queue)
 
 chain.addListener 'add', cb
-chain.add('foo', 'work')
+chain.add('work', 'foo')
 assert.ok(called)
 
 # test adding a duplicate item to the queue
 called: false
-chain.add('foo')
+chain.add(null, 'foo')
 assert.equal(false, called)
 chain.removeListener 'add', cb
 
@@ -40,7 +40,7 @@ cb: (name) ->
 
 chain.addListener 'add', cb
 
-chain.add('bar', job)
+chain.add(job, 'bar')
 assert.ok(called)
 
 # test shifting an item from the queue
