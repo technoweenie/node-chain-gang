@@ -6,18 +6,19 @@ chain: chainGang.create()
 
 # test initial chain gang state
 assert.equal(0, chain.queue.length)
-assert.equal(3, chain.workers)
+assert.equal(3, chain.workers.length)
+chain.active = false
 
 # test adding an item to the queue
 called: false
 cb: (name) ->
   called: true
   assert.equal('foo',       name)
-  assert.equal('work!',     chain.index[name])
+  assert.equal('work',      chain.index[name])
   assert.deepEqual(['foo'], chain.queue)
 
 chain.addListener 'add', cb
-chain.add('foo', 'work!')
+chain.add('foo', 'work')
 assert.ok(called)
 
 # test adding a duplicate item to the queue
@@ -44,8 +45,8 @@ assert.ok(called)
 
 # test shifting an item from the queue
 foo: chain.shift()
-assert.equal('foo',   foo.name)
-assert.equal('work!', foo.callback)
+assert.equal('foo',  foo.name)
+assert.equal('work', foo.callback)
 assert.equal(foo.callback, chain.index[foo.name])
 assert.deepEqual(['bar'], chain.queue)
 
