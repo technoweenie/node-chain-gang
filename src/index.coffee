@@ -10,12 +10,12 @@ class ChainGang
   #
   # Returns ChainGang instance.
   constructor: (options) ->
-    options ||= {}
-    @index:    {}
-    @queue:    []
-    @events:   new events.EventEmitter()
-    @workers:  @buildWorkers(options.workers || 3)
-    @active:   true
+    options: or {}
+    @index:     {}
+    @queue:     []
+    @events:    new events.EventEmitter()
+    @workers:   @buildWorkers(options.workers || 3)
+    @active:    true
 
   # Public: Queues a callback in the ChainGang.
   #
@@ -31,15 +31,15 @@ class ChainGang
     name ||= 'default'
     if @index[name] != undefined then return
 
-    @queue.push(name)
+    @queue.push name
     @index[name]: callback
-    @events.emit('add', name)
+    @events.emit 'add', name
     if @active then @perform()
 
   # Public: Attempts to find an idle worker to perform a job.
   #
   # Returns nothing.
-  perform: () ->
+  perform: ->
     for worker in @workers
       if !worker.performing 
         return worker.perform()
@@ -51,7 +51,7 @@ class ChainGang
   # Returns Object:
   #   name     - The unique String job identifier.
   #   callback - The job's Function.
-  shift: () ->
+  shift: ->
     if job: @queue.shift()
       {name: job, callback: @index[job]}
 
@@ -63,21 +63,21 @@ class ChainGang
   # Emits ('finished', name)
   finish: (name) ->
     delete @index[name]
-    @emit('finished', name)
+    @emit 'finished', name
 
   emit: (event, args...) ->
-    @events.emit(event, args...)
+    @events.emit event, args...
 
   addListener: (event, listener) ->
-    @events.addListener(event, listener)
+    @events.addListener event, listener
 
   removeListener: (event, listener) ->
-    @events.removeListener(event, listener)
+    @events.removeListener event, listener
 
   buildWorkers: (num) ->
     arr: []
     for i in [0...num]
-      arr.push(new Worker(this))
+      arr.push new Worker(this)
     arr
 
 class Worker
@@ -91,7 +91,7 @@ class Worker
   # Returns nothing.
   # Emits ('starting', name)
   # Emits ('error', name, err) if the callback raises an exception.
-  perform: () ->
+  perform: ->
     if @performing then return
 
     data: @chain.shift()
@@ -99,19 +99,19 @@ class Worker
 
     @performing: data.name
 
-    @chain.emit('starting', data.name)
+    @chain.emit 'starting', data.name
     try
-      data.callback(this)
+      data.callback this
     catch err
-      sys.puts(sys.inspect(err))
-      @chain.emit('error', data.name, err)
-      finish(data.name)
+      sys.puts sys.inspect(err)
+      @chain.emit 'error', data.name, err
+      finish data.name
 
   # Finishes the current job, and looks for another.
   #
   # Returns nothing.
-  finish: () ->
-    @chain.finish(@performing)
+  finish: ->
+    @chain.finish @performing
     @performing: false
     @perform()
 
