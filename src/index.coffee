@@ -90,7 +90,7 @@ class Worker
   #
   # Returns nothing.
   # Emits ('starting', name)
-  # Emits ('error', name, err) if the callback raises an exception.
+  # Emits ('error', err, name) if the callback raises an exception.
   perform: ->
     if @performing then return
 
@@ -104,7 +104,7 @@ class Worker
       data.callback this
     catch err
       sys.puts sys.inspect(err)
-      @chain.emit 'error', data.name, err
+      @chain.emit 'error', err, data.name
       finish data.name
 
   # Finishes the current job, and looks for another.
