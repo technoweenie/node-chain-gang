@@ -60,10 +60,10 @@ class ChainGang
   # name - The unique String job identifier.
   #
   # Returns nothing.
-  # Emits ('finished', name)
+  # Emits (name)
   finish: (name) ->
     delete @index[name]
-    @emit 'finished', name
+    @emit name
 
   emit: (event, args...) ->
     @events.emit event, args...
