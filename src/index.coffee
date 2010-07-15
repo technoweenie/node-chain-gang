@@ -61,9 +61,11 @@ class ChainGang
   #
   # Returns nothing.
   # Emits (name)
+  # Emits ('finished', name)
   finish: (name) ->
     delete @index[name]
     @emit name
+    @emit 'finished', name
 
   emit: (event, args...) ->
     @events.emit event, args...
