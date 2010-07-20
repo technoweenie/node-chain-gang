@@ -120,8 +120,6 @@ class Worker
     try
       data.callback this
     catch err
-      @chain.emit "error-$data.name", err
-      @chain.emit "error", err, data.name
       @finish data.name, err
 
   # Finishes the current job, and looks for another.
