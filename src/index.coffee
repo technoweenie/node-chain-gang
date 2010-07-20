@@ -19,16 +19,19 @@ class ChainGang
 
   # Public: Queues a callback in the ChainGang.
   #
-  # callback - The Function to be queued.  Must take a single 'worker' arg,
+  # task     - The Function to be queued.  Must take a single 'worker' arg,
   #            and it must call worker.finish() when complete.
   # name     - Optional String identifier for the job.  If you don't want 
   #            multiple copies of a job queued at the same time, give them
   #            the same name.
+  # callback - Optional Function callback to run after the task completes.  This
+  #            is called regardless if the task is already queued or not.
   #
   # Returns nothing.
   # Emits ('add', name)
-  add: (task, name) ->
+  add: (task, name, callback) ->
     name: or @default_name_for task
+    if callback then @events.addListener name, callback
     if @index[name] != undefined then return
 
     @queue.push name
@@ -70,11 +73,17 @@ class ChainGang
   emit: (event, args...) ->
     @events.emit event, args...
 
+  on: (event, listener) ->
+    @events.on event, listener
+
   addListener: (event, listener) ->
     @events.addListener event, listener
 
   removeListener: (event, listener) ->
     @events.removeListener event, listener
+
+  listeners: (event) ->
+    @events.listeners event
 
   build_workers: (num) ->
     arr: []

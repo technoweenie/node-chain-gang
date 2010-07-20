@@ -28,14 +28,20 @@ ended: []
 chain.addListener 'finished', (name) ->
   ended.push(name)
 
+callback: ->
+  # remove self from listeners
+  this.removeListener 'b', callback
+  ended.push 'auto'
+
 def_name: chain.default_name_for(job)
 chain.addListener def_name, ->
   ended.push('c')
 chain.add job, 'a'
-chain.add job, 'b'
+chain.add job, 'b', callback
 chain.add job
 
 process.addListener 'exit', ->
   assert.deepEqual(['a', 'b', def_name], called)
   assert.deepEqual(['a', 'b', def_name], started)
-  assert.deepEqual(['a', 'b', 'c', def_name], ended)
+  assert.deepEqual(['a', 'auto', 'b', 'c', def_name], ended)
+  assert.deepEqual([], chain.listeners('b'))
