@@ -14,7 +14,7 @@ class ChainGang
     @index:     {}
     @queue:     []
     @events:    new events.EventEmitter()
-    @workers:   @buildWorkers(options.workers || 3)
+    @workers:   @build_workers(options.workers || 3)
     @active:    true
 
   # Public: Queues a callback in the ChainGang.
@@ -27,12 +27,12 @@ class ChainGang
   #
   # Returns nothing.
   # Emits ('add', name)
-  add: (callback, name) ->
-    name ||= 'default'
+  add: (task, name) ->
+    name: or 'default'
     if @index[name] != undefined then return
 
     @queue.push name
-    @index[name]: callback
+    @index[name]: task
     @events.emit 'add', name
     if @active then @perform()
 
@@ -76,7 +76,7 @@ class ChainGang
   removeListener: (event, listener) ->
     @events.removeListener event, listener
 
-  buildWorkers: (num) ->
+  build_workers: (num) ->
     arr: []
     for i in [0...num]
       arr.push new Worker(this)
