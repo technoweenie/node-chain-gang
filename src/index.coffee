@@ -31,12 +31,14 @@ class ChainGang
   # Emits ('add', name)
   add: (task, name, callback) ->
     name: or @default_name_for task
+
     if callback then @events.addListener name, callback
     if @index[name] != undefined then return
 
     @queue.push name
     @index[name]: task
     @events.emit 'add', name
+
     if @active then @perform()
 
   # Public: Attempts to find an idle worker to perform a job.
@@ -63,12 +65,12 @@ class ChainGang
   # name - The unique String job identifier.
   #
   # Returns nothing.
-  # Emits (name)
-  # Emits ('finished', name)
-  finish: (name) ->
+  # Emits (name, err)
+  # Emits ('finished', name, err)
+  finish: (name, err) ->
     delete @index[name]
-    @emit name
-    @emit 'finished', name
+    @emit name, err
+    @emit 'finished', name, err
 
   emit: (event, args...) ->
     @events.emit event, args...
@@ -118,15 +120,15 @@ class Worker
     try
       data.callback this
     catch err
-      sys.puts sys.inspect(err)
-      @chain.emit 'error', err, data.name
-      finish data.name
+      @chain.emit "error-$data.name", err
+      @chain.emit "error", err, data.name
+      @finish data.name, err
 
   # Finishes the current job, and looks for another.
   #
   # Returns nothing.
-  finish: ->
-    @chain.finish @performing
+  finish: (err) ->
+    @chain.finish @performing, err
     @performing: false
     @perform()
 
