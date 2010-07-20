@@ -12,11 +12,11 @@ job: (worker) ->
   setTimeout ->
     called.push(worker.performing)
     value: new Date()
-    if worker.performing == 'c'
-      assert.ok(value - timer >= 100)
-    else
+    if worker.performing == 'a' || worker.performing == 'b'
       assert.ok(value - timer >= 50)
       assert.ok(value - timer <= 110)
+    else
+      assert.ok(value - timer >= 100)
     worker.finish()
   , 50
 
@@ -28,7 +28,7 @@ ended: []
 chain.addListener 'finished', (name) ->
   ended.push(name)
 
-def_name: 'default'
+def_name: chain.default_name_for(job)
 chain.addListener def_name, ->
   ended.push('c')
 chain.add job, 'a'

@@ -28,7 +28,7 @@ class ChainGang
   # Returns nothing.
   # Emits ('add', name)
   add: (task, name) ->
-    name: or 'default'
+    name: or @default_name_for task
     if @index[name] != undefined then return
 
     @queue.push name
@@ -81,6 +81,10 @@ class ChainGang
     for i in [0...num]
       arr.push new Worker(this)
     arr
+
+  default_name_for: (task) ->
+    @crypto: or require 'crypto'
+    @crypto.createHash('md5').update(task.toString()).digest('hex')
 
 class Worker
   constructor: (chain) ->
