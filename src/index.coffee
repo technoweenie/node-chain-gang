@@ -1,5 +1,5 @@
-sys:    require('sys')
-events: require('events')
+sys    = require 'sys'
+events = require 'events'
 
 # Manages the queue of callbacks.
 class ChainGang
@@ -10,12 +10,12 @@ class ChainGang
   #
   # Returns ChainGang instance.
   constructor: (options) ->
-    options: or {}
-    @index:     {}
-    @queue:     []
-    @events:    new events.EventEmitter()
-    @workers:   @build_workers(options.workers || 3)
-    @active:    true
+    options ||= {}
+    @index    = {}
+    @queue    = []
+    @events   = new events.EventEmitter
+    @workers  = @build_workers options.workers || 3
+    @active   = true
 
   # Public: Queues a callback in the ChainGang.
   #
@@ -30,13 +30,13 @@ class ChainGang
   # Returns nothing.
   # Emits ('add', name)
   add: (task, name, callback) ->
-    name: or @default_name_for task
+    name ||= @default_name_for task
 
     if callback then @events.addListener name, callback
     if @index[name] != undefined then return
 
-    @queue.push name
-    @index[name]: task
+    @queue.push    name
+    @index[name] = task
     @events.emit 'add', name
 
     if @active then @perform()
@@ -57,7 +57,7 @@ class ChainGang
   #   name     - The unique String job identifier.
   #   callback - The job's Function.
   shift: ->
-    if job: @queue.shift()
+    if job = @queue.shift()
       {name: job, callback: @index[job]}
 
   # Public: Marks this job completed by name.
@@ -88,20 +88,19 @@ class ChainGang
     @events.listeners event
 
   build_workers: (num) ->
-    arr: []
+    arr = []
     for i in [0...num]
       arr.push new Worker(this)
     arr
 
   default_name_for: (task) ->
-    @crypto: or require 'crypto'
+    @crypto ||= require 'crypto'
     @crypto.createHash('md5').update(task.toString()).digest('hex')
 
 class Worker
   constructor: (chain) ->
-    @chain:      chain
-    @performing: false
-    worker: this
+    @chain      = chain
+    @performing = false
 
   # If this Worker instance is idle, grab a job from the ChainGang and start it.
   #
@@ -111,10 +110,10 @@ class Worker
   perform: ->
     if @performing then return
 
-    data: @chain.shift()
+    data = @chain.shift()
     if !data then return
 
-    @performing: data.name
+    @performing = data.name
 
     @chain.emit 'starting', data.name
     try
@@ -127,7 +126,7 @@ class Worker
   # Returns nothing.
   finish: (err) ->
     @chain.finish @performing, err
-    @performing: false
+    @performing = false
     @perform()
 
 # Initializes a ChainGang instance, and a few Worker instances.
@@ -136,5 +135,5 @@ class Worker
 #           workers - Number of workers to create (default: 3)
 #
 # Returns ChainGang instance.
-exports.create: (options) ->
+exports.create = (options) ->
   new ChainGang(options)
