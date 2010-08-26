@@ -10,10 +10,10 @@ Chain Gang is a small in-process Node.js queue.  It ensures a limit to the numbe
       worker.finish() // and call this when finished
     }
 
-    chain.add('foo', workCallback)
-    chain.add('bar', workCallback)
-    chain.add('baz', workCallback)
-    chain.add('qux', workCallback) // waits until one finishes
+    chain.add(workCallback, 'foo')
+    chain.add(workCallback, 'bar')
+    chain.add(workCallback, 'baz')
+    chain.add(workCallback, 'qux') // waits until one finishes
 
     chain.addListener('error', function(name, error) {
       
