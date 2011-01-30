@@ -2,4 +2,5 @@
 , "version":  "0.2.2"
 , "author":   "technoweenie"
 , "engines" : [ "node >= 0.1.100" ]
+, "directories":{"lib":"./lib"}
 }
