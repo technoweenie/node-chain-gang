@@ -32,8 +32,8 @@ class ChainGang
   add: (task, name, callback) ->
     name ||= @default_name_for task
 
-    if callback then @events.addListener name, callback
     if @index[name] != undefined then return
+    if callback then @events.addListener name, callback
 
     @queue.push    name
     @index[name] = task
