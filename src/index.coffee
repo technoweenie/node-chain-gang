@@ -60,9 +60,7 @@ class ChainGang extends events.EventEmitter
   # Emits ('finished', name)
   finish: (job, err) ->
     @current -= 1
-    @emit 'finished', job.name
-    if err
-      @emit 'error', err, job.name
+    @emit 'finished', job.name, err
     delete @index[job.name]
     delete job
 
@@ -84,8 +82,7 @@ class Job
   #
   # Returns nothing.
   # Emits ('starting', name)
-  # Emits ('error', err, name) if the callback raises an exception.
-  # Emits ('finished', name) when the job has completed.
+  # Emits ('finished', name, err) when the job has completed.
   perform: ->
     @chain.current += 1
     @chain.emit 'starting', @name

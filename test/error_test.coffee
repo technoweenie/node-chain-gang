@@ -7,16 +7,11 @@ assert.equal 2, chain.limit
 
 called_finished = false
 called_callback = false
-called_error    = false
 
-chain.on 'finished', (name) ->
-  assert.equal 'foo', name
-  called_finished = true
-
-chain.on 'error', (err, name) ->
+chain.on 'finished', (name, err) ->
   assert.ok err
   assert.equal 'foo', name
-  called_error = true
+  called_finished = true
 
 chain.add (worker) ->
   a.b == c
@@ -25,5 +20,4 @@ chain.add (worker) ->
 
 process.on 'exit', ->
   assert.ok called_finished
-  assert.ok called_error
   assert.equal false, called_callback
