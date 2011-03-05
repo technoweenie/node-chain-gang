@@ -2,7 +2,7 @@ sys    = require 'sys'
 events = require 'events'
 
 # Manages the queue of callbacks.
-class ChainGang
+class ChainGang extends events.EventEmitter
   # Initializes a ChainGang instance, and a few Worker instances.
   #
   # options - Options Hash.
@@ -10,11 +10,11 @@ class ChainGang
   #
   # Returns ChainGang instance.
   constructor: (options) ->
-    options ||= {}
-    @index    = {}
+    options or= {}
     @queue    = []
-    @events   = new events.EventEmitter
-    @workers  = @build_workers options.workers || 3
+    @current  = 0
+    @limit    = options.workers or 3
+    @index    = {} # name: worker
     @active   = true
 
   # Public: Queues a callback in the ChainGang.
@@ -32,12 +32,16 @@ class ChainGang
   add: (task, name, callback) ->
     name ||= @default_name_for task
 
-    if callback then @events.addListener name, callback
-    if @index[name] != undefined then return
+    worker = @index[name]
 
-    @queue.push    name
-    @index[name] = task
-    @events.emit 'add', name
+    if !worker
+      worker = @index[name] = new Worker @, name, task
+      @queue.push worker
+      @emit 'add', worker.name
+
+    if callback
+      worker.callbacks.push callback
+
 
     if @active then @perform()
 
@@ -45,62 +49,29 @@ class ChainGang
   #
   # Returns nothing.
   perform: ->
-    for worker in @workers
-      if !worker.performing 
-        return worker.perform()
-
-  # Public: Shifts the oldest job from the queue.  Workers take this to start 
-  # performing the job.  The ChainGang still has a reference to the job, 
-  # so identically named jobs won't be queued while it's running.
-  #
-  # Returns Object:
-  #   name     - The unique String job identifier.
-  #   callback - The job's Function.
-  shift: ->
-    if job = @queue.shift()
-      {name: job, callback: @index[job]}
+    while @current < @limit and @queue.length > 0
+      @queue.shift().perform()
 
   # Public: Marks this job completed by name.
   #
   # name - The unique String job identifier.
   #
   # Returns nothing.
-  # Emits (name, err)
   # Emits ('finished', name, err)
-  finish: (name, err) ->
-    delete @index[name]
-    @emit name, err
-    @emit 'finished', name, err
-
-  emit: (event, args...) ->
-    @events.emit event, args...
-
-  on: (event, listener) ->
-    @events.on event, listener
-
-  addListener: (event, listener) ->
-    @events.addListener event, listener
-
-  removeListener: (event, listener) ->
-    @events.removeListener event, listener
-
-  listeners: (event) ->
-    @events.listeners event
-
-  build_workers: (num) ->
-    arr = []
-    for i in [0...num]
-      arr.push new Worker(this)
-    arr
+  finish: (worker, err) ->
+    @current -= 1
+    @emit 'finished', worker.name, err
+    delete @index[worker.name]
+    delete worker
+    if @active then @perform()
 
   default_name_for: (task) ->
     @crypto ||= require 'crypto'
     @crypto.createHash('md5').update(task.toString()).digest('hex')
 
 class Worker
-  constructor: (chain) ->
-    @chain      = chain
-    @performing = false
+  constructor: (@chain, @name, @task) ->
+    @callbacks = []
 
   # If this Worker instance is idle, grab a job from the ChainGang and start it.
   #
@@ -108,26 +79,21 @@ class Worker
   # Emits ('starting', name)
   # Emits ('error', err, name) if the callback raises an exception.
   perform: ->
-    if @performing then return
+    @chain.current += 1
+    @chain.emit 'starting', @name
 
-    data = @chain.shift()
-    if !data then return
-
-    @performing = data.name
-
-    @chain.emit 'starting', data.name
     try
-      data.callback this
+      @task @
     catch err
-      @finish data.name, err
+      @finish err
 
   # Finishes the current job, and looks for another.
   #
   # Returns nothing.
-  finish: (err) ->
-    @chain.finish @performing, err
-    @performing = false
-    @perform()
+  finish: (err, args...) ->
+    @callbacks.forEach (cb) ->
+      cb err, args...
+    @chain.finish @, err
 
 # Initializes a ChainGang instance, and a few Worker instances.
 #

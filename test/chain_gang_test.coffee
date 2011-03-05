@@ -5,17 +5,15 @@ chainGang = require '../src/index'
 chain = chainGang.create()
 
 # test initial chain gang state
-assert.equal 0, chain.queue.length
-assert.equal 3, chain.workers.length
+assert.equal 3, chain.limit
 chain.active = false
 
 # test adding an item to the queue
 called = false
 cb     = (name) ->
   called = true
-  assert.equal     'foo',   name
-  assert.equal     'work',  chain.index[name]
-  assert.deepEqual ['foo'], chain.queue
+  assert.equal 'foo',   name
+  assert.equal 'work',  chain.index.foo.task
 
 chain.addListener 'add', cb
 chain.add 'work', 'foo'
@@ -33,23 +31,15 @@ a      =  0
 job    = -> a += 1
 cb     = (name) ->
   called = true
-  assert.equal     'bar',          name
-  assert.equal     job,            chain.index[name]
-  assert.deepEqual ['foo', 'bar'], chain.queue
+  assert.equal     'bar', name
+  assert.equal     job,   chain.index.bar.task
+  assert.equal     2,     chain.queue.length
 
-chain.addListener 'add', cb
+chain.on 'add', cb
 
 chain.add job, 'bar'
 assert.ok called
 
-# test shifting an item from the queue
-foo = chain.shift()
-assert.equal     'foo',        foo.name
-assert.equal     'work',       foo.callback
-assert.equal     foo.callback, chain.index[foo.name]
-assert.deepEqual ['bar'],      chain.queue
-
 # test finishing an item in the queue
-chain.finish     foo.name
-assert.equal     undefined, chain.index[foo.name]
-assert.deepEqual ['bar'],   chain.queue
+chain.finish     chain.index.foo
+assert.equal     undefined, chain.index.foo
