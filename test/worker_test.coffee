@@ -31,12 +31,12 @@ chain.on 'finished', (name) ->
 callback = ->
   ended.push 'auto'
 
-def_name = chain.default_name_for(job)
+def_name = chain.default_name_for job
 chain.add job, 'a'
 chain.add job, 'b', callback
 chain.add job
 
-process.addListener 'exit', ->
+process.on 'exit', ->
   assert.deepEqual ['a', 'b', def_name], called
   assert.deepEqual ['a', 'b', def_name], started
   assert.deepEqual ['a', 'auto', 'b', def_name], ended

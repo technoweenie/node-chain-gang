@@ -27,20 +27,20 @@ class ChainGang extends events.EventEmitter
   # callback - Optional Function callback to run after the task completes.  This
   #            is called regardless if the task is already queued or not.
   #
-  # Returns nothing.
+  # Returns the String name of the added job.
   # Emits ('add', name)
   add: (task, name, callback) ->
     name ||= @default_name_for task
 
-    worker = @index[name]
+    job = @index[name]
 
-    if !worker
-      worker = @index[name] = new Worker @, name, task
-      @queue.push worker
-      @emit 'add', worker.name
+    if !job
+      job = @index[name] = new Job @, name, task
+      @queue.push job
+      @emit 'add', job.name
 
     if callback
-      worker.callbacks.push callback
+      job.callbacks.push callback
 
 
     if @active then @perform()
@@ -52,32 +52,40 @@ class ChainGang extends events.EventEmitter
     while @current < @limit and @queue.length > 0
       @queue.shift().perform()
 
-  # Public: Marks this job completed by name.
+  # Public: Marks the given job completed.
   #
-  # name - The unique String job identifier.
+  # job - The completed Job.
   #
   # Returns nothing.
-  # Emits ('finished', name, err)
-  finish: (worker, err) ->
+  # Emits ('finished', name)
+  finish: (job, err) ->
     @current -= 1
-    @emit 'finished', worker.name, err
-    delete @index[worker.name]
-    delete worker
+    @emit 'finished', job.name
+    if err
+      @emit 'error', err, job.name
+    delete @index[job.name]
+    delete job
+
     if @active then @perform()
 
+  # Generates a default name for this Job by getting the MD5 hash of the task
+  # function.
+  #
+  # Returns a String MD5 hex digest to be used as the name for this Job.
   default_name_for: (task) ->
     @crypto ||= require 'crypto'
     @crypto.createHash('md5').update(task.toString()).digest('hex')
 
-class Worker
+class Job
   constructor: (@chain, @name, @task) ->
     @callbacks = []
 
-  # If this Worker instance is idle, grab a job from the ChainGang and start it.
+  # Performs the Job, running any callbacks.  See finish().
   #
   # Returns nothing.
   # Emits ('starting', name)
   # Emits ('error', err, name) if the callback raises an exception.
+  # Emits ('finished', name) when the job has completed.
   perform: ->
     @chain.current += 1
     @chain.emit 'starting', @name
@@ -87,13 +95,15 @@ class Worker
     catch err
       @finish err
 
-  # Finishes the current job, and looks for another.
+  # Finishes the current job, and looks for another.  Any Job callbacks are
+  # called with the error (if any), and any other arguments.
   #
   # Returns nothing.
   finish: (err, args...) ->
     @callbacks.forEach (cb) ->
       cb err, args...
     @chain.finish @, err
+
 
 # Initializes a ChainGang instance, and a few Worker instances.
 #
