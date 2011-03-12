@@ -1,8 +1,10 @@
-{ "name":     "chain-gang"
-, "version":  "1.0.0-beta2"
-, "author":   "technoweenie"
-, "engines" : [ "node >= 0.2.0" ]
-, "homepage": "https://github.com/technoweenie/node-chain-gang"
+{ "name":        "chain-gang"
+, "description": "Small in-process queueing library"
+, "version":     "1.0.0-beta3"
+, "author":      "technoweenie"
+, "engines" :    [ "node >= 0.2.0" ]
+, "homepage":    "https://github.com/technoweenie/node-chain-gang"
+, "main":        "./lib/index"
 , "directories":
   { "lib": "./lib"
   }
