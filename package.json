@@ -1,5 +1,13 @@
 { "name":     "chain-gang"
-, "version":  "1.0.0-beta1"
+, "version":  "1.0.0-beta2"
 , "author":   "technoweenie"
 , "engines" : [ "node >= 0.2.0" ]
+, "homepage": "https://github.com/technoweenie/node-chain-gang"
+, "directories":
+  { "lib": "./lib"
+  }
+, "repository":
+  { "type": "git"
+  , "url":  "https://github.com/technoweenie/node-chain-gang.git"
+  }
 }
