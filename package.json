@@ -1,5 +1,5 @@
 { "name":     "chain-gang"
-, "version":  "0.2.2"
+, "version":  "1.0.0-beta1"
 , "author":   "technoweenie"
-, "engines" : [ "node >= 0.1.100" ]
+, "engines" : [ "node >= 0.2.0" ]
 }

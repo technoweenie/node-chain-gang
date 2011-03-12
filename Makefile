@@ -1,23 +1,32 @@
-test: deps
+test: coffee-dep
 	@find test -name '*_test.coffee' | xargs -n 1 -t coffee
 
 dev: generate-js
 	@coffee -wc --bare -o lib src/
 
-publish: generate-js
-	@test `which npm` || echo 'You need npm to do npm publish... makes sense?'
+VERSION = $(shell coffee src/npm-version.coffee)
+publish: npm-dep generate-js
+	git commit --allow-empty -a -m "release $(VERSION)"
+	git tag v$(VERSION)
+	git push origin master
+	git push origin v$(VERSION)
 	npm publish
-	@remove-js
+	@make remove-js
 
-install: generate-js
-	@test `which npm` || echo 'You need npm to do npm install... makes sense?'
+install: npm-dep generate-js
 	npm install
-	@remove-js
+	@make remove-js
 
-generate-js: deps
+generate-js: coffee-dep
 	@coffee -c --bare -o lib src/
 
-deps:
+remove-js:
+	@rm -fr lib/
+
+npm-dep:
+	@test `which npm` || echo 'You need npm to do npm install... makes sense?'
+
+coffee-dep:
 	@test `which coffee` || echo 'You need to have CoffeeScript in your PATH.\nPlease install it using `brew install coffee-script` or `npm install coffee-script`.'
 
 .PHONY: all
