@@ -34,7 +34,7 @@ class ChainGang extends Events.EventEmitter
     job = @index[name]
 
     if !job
-      job = @index[name] = new Job @, name, task
+      job = @index[name] = new exports.Job @, name, task
       @queue.push job
       @emit 'add', job.name
 
@@ -108,3 +108,6 @@ class Job
 # Returns ChainGang instance.
 exports.create = (options) ->
   new ChainGang(options)
+
+exports.ChainGang = ChainGang
+exports.Job       = Job
