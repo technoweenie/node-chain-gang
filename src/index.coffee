@@ -1,8 +1,7 @@
-sys    = require 'sys'
-events = require 'events'
+Events = require 'events'
 
 # Manages the queue of callbacks.
-class ChainGang extends events.EventEmitter
+class ChainGang extends Events.EventEmitter
   # Initializes a ChainGang instance, and a few Worker instances.
   #
   # options - Options Hash.
