@@ -20,14 +20,14 @@ class ChainGang extends Events.EventEmitter
   #
   # task     - The Function to be queued.  Must take a single 'worker' arg,
   #            and it must call worker.finish() when complete.
-  # name     - Optional String identifier for the job.  If you don't want 
+  # name     - Optional String identifier for the job.  If you don't want
   #            multiple copies of a job queued at the same time, give them
   #            the same name.
   # callback - Optional Function callback to run after the task completes.  This
   #            is called regardless if the task is already queued or not.
   #
   # Returns the String name of the added job.
-  # Emits ('add', name)
+  # Emits ('add', name) on the ChainGang instance.
   add: (task, name, callback) ->
     name ||= @default_name_for task
 
@@ -56,7 +56,7 @@ class ChainGang extends Events.EventEmitter
   # job - The completed Job.
   #
   # Returns nothing.
-  # Emits ('finished', name)
+  # Emits ('finished', name, err) on the ChainGang instance.
   finish: (job, err) ->
     @current -= 1
     @emit 'finished', job.name, err
@@ -80,8 +80,7 @@ class Job
   # Performs the Job, running any callbacks.  See finish().
   #
   # Returns nothing.
-  # Emits ('starting', name)
-  # Emits ('finished', name, err) when the job has completed.
+  # Emits ('starting', name) on the ChainGang instance.
   perform: ->
     @chain.current += 1
     @chain.emit 'starting', @name
