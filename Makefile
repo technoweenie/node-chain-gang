@@ -4,7 +4,7 @@ test: coffee-dep
 dev: generate-js
 	@coffee -wc --bare -o lib src/
 
-VERSION = $(shell coffee src/npm-version.coffee)
+VERSION = $(shell cat package.json | grep '"version"' | sed 's/.*"version":.*"\(.*\)"/\1/')
 publish: npm-dep generate-js
 	git commit --allow-empty -a -m "release $(VERSION)"
 	git tag v$(VERSION)
