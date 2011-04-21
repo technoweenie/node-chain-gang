@@ -31,7 +31,7 @@ chain.on 'finished', (name) ->
 callback = ->
   ended.push 'auto'
 
-def_name = chain.default_name_for job
+def_name = chain.defaultNameFor job
 chain.add job, 'a'
 chain.add job, 'b', callback
 chain.add job

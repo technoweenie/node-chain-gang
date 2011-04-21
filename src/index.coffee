@@ -29,7 +29,7 @@ class ChainGang extends Events.EventEmitter
   # Returns the String name of the added job.
   # Emits ('add', name) on the ChainGang instance.
   add: (task, name, callback) ->
-    name ||= @default_name_for task
+    name ||= @defaultNameFor task
 
     job = @index[name]
 
@@ -69,7 +69,7 @@ class ChainGang extends Events.EventEmitter
   # function.
   #
   # Returns a String MD5 hex digest to be used as the name for this Job.
-  default_name_for: (task) ->
+  defaultNameFor: (task) ->
     @crypto ||= require 'crypto'
     @crypto.createHash('md5').update(task.toString()).digest('hex')
 
