@@ -5,16 +5,22 @@ class ChainGang extends Events.EventEmitter
   # Initializes a ChainGang instance, and a few Worker instances.
   #
   # options - Options Hash.
-  #           workers - Number of workers to create (default: 3)
+  #           workers         - Number of workers to create (default: 3)
+  #           timeout         - Optional Number of seconds to wait for the job
+  #                             to run.
+  #           timeoutCallback - Optional function to call when timeout is
+  #                             triggered.
   #
   # Returns ChainGang instance.
   constructor: (options) ->
-    options or= {}
-    @queue    = []
-    @current  = 0
-    @limit    = options.workers or 3
-    @index    = {} # name: worker
-    @active   = true
+    options  or= {}
+    @queue     = []
+    @current   = 0
+    @limit     = options.workers or 3
+    @index     = {} # name: worker
+    @active    = true
+    @timeout   = options.timeout or 0
+    @timeoutCb = options.timeoutCallback
 
   # Public: Queues a callback in the ChainGang.
   #
@@ -65,6 +71,28 @@ class ChainGang extends Events.EventEmitter
 
     if @active then @perform()
 
+  # Sets up a timer for the given job, if a timeout is set on the chain.
+  #
+  # job - The new Job instance that is getting the timer.
+  #
+  # Returns a valid timerId for clearTimeout() if a timeout is set, or null.
+  setTimerFor: (job) ->
+    if @timeout <= 0
+      false
+    else
+      setTimeout @triggerTimeout, 100, job
+
+  # Handles a job that has been in the queue too long.  This is the callback
+  # from setTimeout().
+  #
+  # job - the Job instance that is taking too long.
+  #
+  # Returns nothing.
+  triggerTimeout: (job) ->
+    job.timedOut = true
+    job.chain.timeoutCb? job
+    job.finish error: "Timed out"
+
   # Generates a default name for this Job by getting the MD5 hash of the task
   # function.
   #
@@ -76,12 +104,19 @@ class ChainGang extends Events.EventEmitter
 class Job
   constructor: (@chain, @name, @task) ->
     @callbacks = []
+    @timedOut  = false
+    @timer     = @chain.setTimerFor @
 
   # Performs the Job, running any callbacks.  See finish().
   #
   # Returns nothing.
   # Emits ('starting', name) on the ChainGang instance.
   perform: ->
+    if @timedOut
+      return
+    else if @timer?
+      clearTimeout @timer
+
     @chain.current += 1
     @chain.emit 'starting', @name
 
@@ -98,7 +133,6 @@ class Job
     @callbacks.forEach (cb) ->
       cb err, args...
     @chain.finish @, err
-
 
 # Initializes a ChainGang instance, and a few Worker instances.
 #
