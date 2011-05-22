@@ -3,9 +3,17 @@
 Chain Gang is a small in-process Node.js queue.  It ensures a limit to the
 number of simultaneous tasks in action at any time.
 
+## INSTALL
+
+    npm install chain-gang
+
+The npm install process is only verified to work in npm 1.0.x.
+
+## USAGE
+
 First, set up a Chain Gang, and specify the number of workers.
 
-    var chainGang = require('chaingang')
+    var chainGang = require('chain-gang')
     var chain     = chainGang.create({workers: 3})
 
 Now, write a function to do some work.
