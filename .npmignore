@@ -2,4 +2,3 @@ src/
 .DS_Store
 .git*
 *.md
-Makefile
