@@ -73,14 +73,18 @@ class ChainGang extends Events.EventEmitter
 
     if @active then @perform()
 
+  # Public: Generates a message detailing the current status of the chain
+  # gang instance.
+  #
+  # Returns a String message.
   checkStatus: ->
     i = 1
     s = []
     now = new Date
-    for job in @queue
-      s.push "#{i}: #{job.name} @ #{now - job.created}s ago (#{job.requests})"
+    for name, job of @index
+      s.push "#{i}: #{name} @ #{now - job.created}s ago (#{job.requests})"
       i++
-    s.join "\n"
+    if s.length == 0 then "empty chain-gang" else s.join "\n"
 
   # Sets up a timer for the given job, if a timeout is set on the chain.
   #
