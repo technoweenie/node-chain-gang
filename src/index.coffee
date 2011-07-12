@@ -44,6 +44,8 @@ class ChainGang extends Events.EventEmitter
       @queue.push job
       @emit 'add', job.name
 
+    job.requests += 1
+
     if callback
       job.callbacks.push callback
 
@@ -106,6 +108,8 @@ class Job
     @callbacks = []
     @timedOut  = false
     @timer     = @chain.setTimerFor @
+    @requests  = 0
+    @created   = new Date
 
   # Performs the Job, running any callbacks.  See finish().
   #

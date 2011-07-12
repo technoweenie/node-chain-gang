@@ -19,11 +19,16 @@ chain.addListener 'add', cb
 chain.add 'work', 'foo'
 assert.ok called
 
+job = chain.index.foo
+assert.equal 1, job.requests
+assert.ok job.created?
+
 # test adding a duplicate item to the queue
 called = false
 chain.add null, 'foo'
 assert.equal false, called
 chain.removeListener 'add', cb
+assert.equal 2, job.requests
 
 # test adding a 2nd item to the queue
 called = false
