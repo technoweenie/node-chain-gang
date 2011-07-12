@@ -73,6 +73,15 @@ class ChainGang extends Events.EventEmitter
 
     if @active then @perform()
 
+  checkStatus: ->
+    i = 1
+    s = []
+    now = new Date
+    for job in @queue
+      s.push "#{i}: #{job.name} @ #{now - job.created}s ago (#{job.requests})"
+      i++
+    s.join "\n"
+
   # Sets up a timer for the given job, if a timeout is set on the chain.
   #
   # job - The new Job instance that is getting the timer.

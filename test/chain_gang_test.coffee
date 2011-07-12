@@ -23,12 +23,16 @@ job = chain.index.foo
 assert.equal 1, job.requests
 assert.ok job.created?
 
+assert.equal "1: foo @ 0s ago (1)", chain.checkStatus()
+
 # test adding a duplicate item to the queue
 called = false
 chain.add null, 'foo'
 assert.equal false, called
 chain.removeListener 'add', cb
 assert.equal 2, job.requests
+
+assert.equal "1: foo @ 0s ago (2)", chain.checkStatus()
 
 # test adding a 2nd item to the queue
 called = false
