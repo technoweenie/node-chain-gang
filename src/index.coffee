@@ -82,7 +82,8 @@ class ChainGang extends Events.EventEmitter
     s = []
     now = new Date
     for name, job of @index
-      s.push "#{i}: #{name} @ #{now - job.created}s ago (#{job.requests})"
+      diff = Math.round(now - job.created) / 1000
+      s.push "#{i}: #{name} @ #{diff}s ago (#{job.requests})"
       i++
     if s.length == 0 then "empty chain-gang" else s.join "\n"
 
