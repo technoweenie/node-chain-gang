@@ -32,7 +32,9 @@ assert.equal false, called
 chain.removeListener 'add', cb
 assert.equal 2, job.requests
 
-assert.equal "1: foo @ 0s ago (2)", chain.checkStatus()
+status = chain.checkStatus()
+regex  = /^1: foo \@ 0(\.\d+)?s ago \(2\)$/
+assert.ok status.match(regex), "#{status} does not match #{regex}"
 
 # test adding a 2nd item to the queue
 called = false
