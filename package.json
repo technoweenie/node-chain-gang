@@ -12,4 +12,10 @@
   { "type": "git"
   , "url":  "https://github.com/technoweenie/node-chain-gang.git"
   }
+, "scripts":
+  { "test": "make test"
+  }
+, "devDependencies":
+  { "coffee-script": "1.1.2"
+  }
 }
