@@ -1,4 +1,3 @@
-sys       = require 'sys'
 assert    = require 'assert'
 chainGang = require '../src/index'
 
