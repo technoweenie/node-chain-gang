@@ -35,21 +35,32 @@ status = chain.checkStatus()
 regex = /^1: foo \@ 0(\.\d+)?s ago \(2\)$/
 assert.ok status.match(regex), "#{status} does not match #{regex}"
 
-# test adding a 2nd item to the queue
+# test adding a 2nd item to the queue with only a callback
 called = false
+cbCalled = false
 a = 0
-job = -> a += 1
-cb = (name) ->
+job = (job) ->
+  a += 1
+  job.finish null, 1
+
+cb = (err, arg) ->
+  cbCalled = true
+  assert.equal null, err
+  assert.equal 1, arg
+
+chain.on 'add', (name) ->
   called = true
-  assert.equal 'bar', name
-  assert.equal job, chain.index.bar.task
+  assert.equal chain.defaultNameFor(job), name
+  assert.equal job, chain.index[name].task
   assert.equal 2, chain.queue.length
 
-chain.on 'add', cb
-
-chain.add job, 'bar'
+chain.add job, cb
 assert.ok called
 
-# test finishing an item in the queue
-chain.finish chain.index.foo
+# test performing and checking callbacks
+assert.ok !cbCalled
+assert.ok chain.index.foo
+
+chain.perform()
+assert.ok cbCalled
 assert.equal undefined, chain.index.foo

@@ -35,6 +35,9 @@ class ChainGang extends Events.EventEmitter
   # Returns the String name of the added job.
   # Emits ('add', name) on the ChainGang instance.
   add: (task, name, callback) ->
+    if typeof(name) == 'function'
+      callback = name
+      name = null
     name ||= @defaultNameFor task
 
     job = @index[name]
