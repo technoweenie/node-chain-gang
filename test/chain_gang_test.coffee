@@ -1,4 +1,4 @@
-assert    = require 'assert'
+assert = require 'assert'
 chainGang = require '../src/index'
 
 chain = chainGang.create()
@@ -9,10 +9,10 @@ chain.active = false
 
 # test adding an item to the queue
 called = false
-cb     = (name) ->
+cb = (name) ->
   called = true
-  assert.equal 'foo',   name
-  assert.equal 'work',  chain.index.foo.task
+  assert.equal 'foo', name
+  assert.equal 'work', chain.index.foo.task
 
 chain.addListener 'add', cb
 chain.add 'work', 'foo'
@@ -32,18 +32,18 @@ chain.removeListener 'add', cb
 assert.equal 2, job.requests
 
 status = chain.checkStatus()
-regex  = /^1: foo \@ 0(\.\d+)?s ago \(2\)$/
+regex = /^1: foo \@ 0(\.\d+)?s ago \(2\)$/
 assert.ok status.match(regex), "#{status} does not match #{regex}"
 
 # test adding a 2nd item to the queue
 called = false
-a      =  0
-job    = -> a += 1
-cb     = (name) ->
+a = 0
+job = -> a += 1
+cb = (name) ->
   called = true
-  assert.equal     'bar', name
-  assert.equal     job,   chain.index.bar.task
-  assert.equal     2,     chain.queue.length
+  assert.equal 'bar', name
+  assert.equal job, chain.index.bar.task
+  assert.equal 2, chain.queue.length
 
 chain.on 'add', cb
 
@@ -51,5 +51,5 @@ chain.add job, 'bar'
 assert.ok called
 
 # test finishing an item in the queue
-chain.finish     chain.index.foo
-assert.equal     undefined, chain.index.foo
+chain.finish chain.index.foo
+assert.equal undefined, chain.index.foo

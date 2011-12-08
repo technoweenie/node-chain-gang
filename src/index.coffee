@@ -13,13 +13,13 @@ class ChainGang extends Events.EventEmitter
   #
   # Returns ChainGang instance.
   constructor: (options) ->
-    options  or= {}
-    @queue     = []
-    @current   = 0
-    @limit     = options.workers or 3
-    @index     = {} # name: worker
-    @active    = true
-    @timeout   = options.timeout or 0
+    options or= {}
+    @queue = []
+    @current = 0
+    @limit = options.workers or 3
+    @index = {} # name: worker
+    @active = true
+    @timeout = options.timeout or 0
     @timeoutCb = options.timeoutCallback
 
   # Public: Queues a callback in the ChainGang.
@@ -29,8 +29,8 @@ class ChainGang extends Events.EventEmitter
   # name     - Optional String identifier for the job.  If you don't want
   #            multiple copies of a job queued at the same time, give them
   #            the same name.
-  # callback - Optional Function callback to run after the task completes.  This
-  #            is called regardless if the task is already queued or not.
+  # callback - Optional Function callback to run after the task completes.  
+  #            This is called regardless if the task is already queued or not.
   #
   # Returns the String name of the added job.
   # Emits ('add', name) on the ChainGang instance.
@@ -48,7 +48,6 @@ class ChainGang extends Events.EventEmitter
 
     if callback
       job.callbacks.push callback
-
 
     if @active then @perform()
 
@@ -120,10 +119,10 @@ class ChainGang extends Events.EventEmitter
 class Job
   constructor: (@chain, @name, @task) ->
     @callbacks = []
-    @timedOut  = false
-    @timer     = @chain.setTimerFor @
-    @requests  = 0
-    @created   = new Date
+    @timedOut = false
+    @timer = @chain.setTimerFor @
+    @requests = 0
+    @created = new Date
 
   # Performs the Job, running any callbacks.  See finish().
   #
@@ -162,4 +161,4 @@ exports.create = (options) ->
   new ChainGang(options)
 
 exports.ChainGang = ChainGang
-exports.Job       = Job
+exports.Job = Job
