@@ -14,7 +14,7 @@ cb = (name) ->
   assert.equal 'foo', name
   assert.equal 'work', chain.index.foo.task
 
-chain.addListener 'add', cb
+chain.on 'add', cb
 chain.add 'work', 'foo'
 assert.ok called
 
