@@ -14,11 +14,11 @@ The npm install process is only verified to work in npm 1.0.x.
 First, set up a Chain Gang, and specify the number of workers.
 
     var chainGang = require('chain-gang')
-    var chain     = chainGang.create({workers: 3})
+    var chain = chainGang.create({workers: 3})
 
 Now, write a function to do some work.
 
-    var task = function(worker) {
+    var task = function(job) {
       // do some work
       var err;
       try {
@@ -26,7 +26,7 @@ Now, write a function to do some work.
       catch(e) {
         err = e
       }
-      worker.finish(err, 1, 2, 3) // and call this when finished
+      job.finish(err, 1, 2, 3) // and call this when finished
     }
 
 You can add it add it to the Chain Gang and have it completed when there
@@ -83,6 +83,8 @@ persistent data store.
 Run this to compile coffeescript to javascript as you go:
 
     make dev
+
+Hopefully tests are green on [Travis-CI](http://travis-ci.org/#!/technoweenie/node-chain-gang).
 
 ## Note on Patches/Pull Requests
 
