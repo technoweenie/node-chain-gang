@@ -38,7 +38,7 @@ class ChainGang extends Events.EventEmitter
     if typeof(name) == 'function'
       callback = name
       name = null
-    name ||= @defaultNameFor task
+    name or= @defaultNameFor task
 
     job = @index[name]
 
@@ -116,7 +116,7 @@ class ChainGang extends Events.EventEmitter
   #
   # Returns a String MD5 hex digest to be used as the name for this Job.
   defaultNameFor: (task) ->
-    @crypto ||= require 'crypto'
+    @crypto or= require 'crypto'
     @crypto.createHash('md5').update(task.toString()).digest('hex')
 
 class Job
