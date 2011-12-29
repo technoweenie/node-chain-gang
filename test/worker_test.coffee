@@ -24,7 +24,7 @@ chain.on 'starting', (name) ->
   started.push(name)
 
 ended = []
-chain.on 'finished', (name) ->
+chain.on 'finished', (err, name) ->
   ended.push(name)
 
 callback = ->

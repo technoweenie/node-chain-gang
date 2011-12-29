@@ -66,10 +66,10 @@ class ChainGang extends Events.EventEmitter
   # job - The completed Job.
   #
   # Returns nothing.
-  # Emits ('finished', name, err) on the ChainGang instance.
+  # Emits ('finished', err, name) on the ChainGang instance.
   finish: (job, err) ->
     @current -= 1
-    @emit 'finished', job.name, err
+    @emit 'finished', err, job.name
     delete @index[job.name]
     delete job
 

@@ -7,7 +7,7 @@ assert.equal 2, chain.limit
 called_finished = false
 called_callback = false
 
-chain.on 'finished', (name, err) ->
+chain.on 'finished', (err, name) ->
   assert.ok err
   assert.equal 'foo', name
   called_finished = true
