@@ -63,6 +63,14 @@ watch the status of jobs entering and exiting the chain.
       console.log(name, "has finished.  Error:", err)
     })
 
+    chain.on('empty', function() {
+      console.log('queue is empty')
+    })
+
+    chain.on('timeout', function(job) {
+      console.log(job.name, 'timed out')
+    })
+
 ## Use Case
 
 Let's say you have an expensive child process to run when requests come in.
