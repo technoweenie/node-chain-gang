@@ -10,6 +10,8 @@ class ChainGang extends Events.EventEmitter
   #                             to run.
   #           timeoutCallback - Optional function to call when timeout is
   #                             triggered.
+  #           emptyCallback   - Optional function to call when all jobs are 
+  #                             complete.
   #
   # Returns ChainGang instance.
   constructor: (options) ->
@@ -21,6 +23,7 @@ class ChainGang extends Events.EventEmitter
     @active = true
     @timeout = options.timeout or 0
     @timeoutCb = options.timeoutCallback
+    @emptyCb = options.emptyCallback
 
   # Public: Queues a callback in the ChainGang.
   #
@@ -73,7 +76,11 @@ class ChainGang extends Events.EventEmitter
     delete @index[job.name]
     delete job
 
-    if @active then @perform()
+    if @active
+      if @queue.length == 0
+        @emptyCb?()
+      else
+        @perform()
 
   # Public: Generates a message detailing the current status of the chain
   # gang instance.
