@@ -8,7 +8,7 @@ class ChainGang extends Events.EventEmitter
   #           workers   - Number of workers to create (default: 3)
   #           timeout   - Optional Number of seconds to wait for the job to run.
   #           onTimeout - Optional function to call when timeout is triggered.
-  #           onEmpty   - Optional function to call when all jobs are compelete.
+  #                       Deprecated, listen for the 'timeout' event instead.
   #
   # Returns ChainGang instance.
   constructor: (options) ->
@@ -19,8 +19,8 @@ class ChainGang extends Events.EventEmitter
     @index = {} # name: worker
     @active = true
     @timeout = options.timeout or 0
-    @timeoutCb = options.onTimeout or options.timeoutCallback
-    @emptyCb = options.onEmpty
+    if cb = (options.onTimeout or options.timeoutCallback)
+      @on 'timeout', cb
 
   # Public: Queues a callback in the ChainGang.
   #
@@ -75,7 +75,7 @@ class ChainGang extends Events.EventEmitter
 
     if @active
       if @queue.length == 0
-        @emptyCb?()
+        @emit 'empty'
       else
         @perform()
 
@@ -112,7 +112,7 @@ class ChainGang extends Events.EventEmitter
   # Returns nothing.
   triggerTimeout: (job) ->
     job.timedOut = true
-    job.chain.timeoutCb? job
+    job.chain.emit 'timeout', job
     job.finish message: "timeout"
 
   # Generates a default name for this Job by getting the MD5 hash of the task

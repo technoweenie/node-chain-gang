@@ -3,7 +3,8 @@ chainGang = require '../src/index'
 
 calls = []
 onEmpty = false
-chain = chainGang.create onEmpty: -> onEmpty = true
+chain = chainGang.create()
+chain.on 'empty', -> onEmpty = true
 
 task = -> assert.fail(onEmpty)
 chain.add(task, 'a', -> calls.push(1))

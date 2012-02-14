@@ -6,13 +6,11 @@ timedOut  = 0
 calls     = 0
 timer     = null # timer of the test
 
-chain = chainGang.create(
-  workers: 1
-  timeout: 0.1
-  onTimeout: ->
-    timedOut += 1
-    clearTimeout timer
-)
+chain = chainGang.create workers: 1, timeout: 0.1
+
+chain.on 'timeout', ->
+  timedOut += 1
+  clearTimeout timer
 
 # disable the chain so we can simulate long queueing times
 chain.active = false
