@@ -98,7 +98,7 @@ class ChainGang extends Events.EventEmitter
     if @timeout <= 0
       false
     else
-      setTimeout @triggerTimeout, 100, job
+      setTimeout @triggerTimeout, @timeout * 1000, job
 
   # Handles a job that has been in the queue too long.  This is the callback
   # from setTimeout().
