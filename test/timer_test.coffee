@@ -9,7 +9,7 @@ timer     = null # timer of the test
 chain = chainGang.create(
   workers: 1
   timeout: 0.1
-  timeoutCallback: ->
+  onTimeout: ->
     timedOut += 1
     clearTimeout timer
 )

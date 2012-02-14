@@ -5,13 +5,10 @@ class ChainGang extends Events.EventEmitter
   # Initializes a ChainGang instance, and a few Worker instances.
   #
   # options - Options Hash.
-  #           workers         - Number of workers to create (default: 3)
-  #           timeout         - Optional Number of seconds to wait for the job
-  #                             to run.
-  #           timeoutCallback - Optional function to call when timeout is
-  #                             triggered.
-  #           emptyCallback   - Optional function to call when all jobs are 
-  #                             complete.
+  #           workers   - Number of workers to create (default: 3)
+  #           timeout   - Optional Number of seconds to wait for the job to run.
+  #           onTimeout - Optional function to call when timeout is triggered.
+  #           onEmpty   - Optional function to call when all jobs are compelete.
   #
   # Returns ChainGang instance.
   constructor: (options) ->
@@ -22,8 +19,8 @@ class ChainGang extends Events.EventEmitter
     @index = {} # name: worker
     @active = true
     @timeout = options.timeout or 0
-    @timeoutCb = options.timeoutCallback
-    @emptyCb = options.emptyCallback
+    @timeoutCb = options.onTimeout or options.timeoutCallback
+    @emptyCb = options.onEmpty
 
   # Public: Queues a callback in the ChainGang.
   #

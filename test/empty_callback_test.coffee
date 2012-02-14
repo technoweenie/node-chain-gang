@@ -3,7 +3,7 @@ chainGang = require '../src/index'
 
 calls = []
 onEmpty = false
-chain = chainGang.create emptyCallback: -> onEmpty = true
+chain = chainGang.create onEmpty: -> onEmpty = true
 
 task = -> assert.fail(onEmpty)
 chain.add(task, 'a', -> calls.push(1))
