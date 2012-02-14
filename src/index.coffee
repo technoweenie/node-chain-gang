@@ -109,7 +109,7 @@ class ChainGang extends Events.EventEmitter
   triggerTimeout: (job) ->
     job.timedOut = true
     job.chain.timeoutCb? job
-    job.finish error: "Timed out"
+    job.finish message: "timeout"
 
   # Generates a default name for this Job by getting the MD5 hash of the task
   # function.

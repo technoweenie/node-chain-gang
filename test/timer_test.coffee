@@ -23,7 +23,7 @@ chain.add (worker) ->
   calls += 1
   worker.finish()
 , 'a', (err) ->
-  assert.equal "Timed out", err.error
+  assert.equal "timeout", err.message
   callbacks += 1
 
 setTimeout ->
