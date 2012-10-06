@@ -71,7 +71,6 @@ class ChainGang extends Events.EventEmitter
     @current -= 1
     @emit 'finished', err, job.name
     delete @index[job.name]
-    delete job
 
     if @active
       if @queue.length == 0
